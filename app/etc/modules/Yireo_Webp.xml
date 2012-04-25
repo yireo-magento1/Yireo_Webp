@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Yireo Webp-module for Magento 
+ *
+ * @package     Yireo_Webp
+ * @author      Yireo (http://www.yireo.com/)
+ * @copyright   Copyright (c) 2012 Yireo (http://www.yireo.com/)
+ * @license     Open Yireo License
+ */
+-->
+<config>
+    <modules>
+        <Yireo_Webp>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Yireo_Webp>
+    </modules>
+</config>

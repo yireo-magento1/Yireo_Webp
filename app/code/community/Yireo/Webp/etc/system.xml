@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Yireo WebP for Magento 
+ *
+ * @package     Yireo_WebP
+ * @author      Yireo (http://www.yireo.com/)
+ * @copyright   Copyright (c) 2012 Yireo (http://www.yireo.com/)
+ * @license     Open Software License
+ */
+-->
+<config>
+    <sections>
+        <web>
+            <groups>
+                <webp translate="label">
+                    <label>Webp images</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>900</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+                        <cwebp_path translate="label">
+                            <label>Path to cwebp</label>
+                            <comment><![CDATA[Path to the "cwebp" binary]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </cwebp_path>
+                    </fields>
+                </webp>
+            </groups>
+        </web>
+    </sections>
+</config>
