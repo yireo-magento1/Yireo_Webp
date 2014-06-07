@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<layout>
-    <default>
-        <reference name="head">
-            <action method="addJs"><script>webp/detect.js</script></action>
-        </reference>
-    </default>
-</layout>
