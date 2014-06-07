@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Yireo Webp for Magento 
+ *
+ * @package     Yireo_Webp
+ * @author      Yireo (http://www.yireo.com/)
+ * @copyright   Copyright (c) 2012 Yireo (http://www.yireo.com/)
+ * @license     Open Yireo License
+ */
+-->
+<config>
+
+    <modules>
+        <Yireo_Webp>
+            <version>0.2.4</version>
+        </Yireo_Webp>
+    </modules>
+
+    <global>
+        <blocks>
+            <webp>
+                <class>Yireo_Webp_Block</class>
+            </webp>
+        </blocks>
+
+        <helpers>
+            <webp>
+                <class>Yireo_Webp_Helper</class>
+            </webp>
+        </helpers>
+
+        <models>
+            <webp>
+                <class>Yireo_Webp_Model</class>
+            </webp>
+        </models>
+	</global>
+
+    <frontend>
+        <events>
+            <core_block_abstract_to_html_after>
+                <observers>
+                    <webp_observer>
+                        <type>singleton</type>
+                        <class>Yireo_Webp_Model_Observer</class>
+                        <method>coreBlockAbstractToHtmlAfter</method>
+                    </webp_observer>
+                </observers>
+            </core_block_abstract_to_html_after>
+        </events>
+
+        <layout>
+            <updates>
+                <webp>
+                    <file>webp.xml</file>
+                </webp>
+            </updates>
+        </layout>
+    </frontend>
+
+    <default>
+        <web>
+            <webp>
+                <enabled>1</enabled>
+                <cwebp_path>/usr/local/bin/cwebp</cwebp_path>
+            </webp>
+        </web>
+    </default>
+</config>
