@@ -4,7 +4,7 @@
  *
  * @package     Yireo_Webp
  * @author      Yireo (http://www.yireo.com/)
- * @copyright   Copyright (C) 2014 Yireo (http://www.yireo.com/)
+ * @copyright   Copyright 2015 Yireo (http://www.yireo.com/)
  * @license     Open Source License (OSL v3)
  */
 
@@ -22,8 +22,9 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         if($enabled === null) {
 
             $config_enabled = (bool)Mage::getStoreConfig('web/webp/enabled');
-            $browser = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : null;
             $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
+
+            $browser = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : null;
 
             $enabled = true;
             if($config_enabled == false) {
