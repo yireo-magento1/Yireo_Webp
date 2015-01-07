@@ -5,14 +5,14 @@
  *
  * @package     Yireo_Webp
  * @author      Yireo (http://www.yireo.com/)
- * @copyright   Copyright (c) 2013 Yireo (http://www.yireo.com/)
+ * @copyright   Copyright 2015 Yireo (http://www.yireo.com/)
  * @license     Open Yireo License
  */
 -->
 <config>
     <modules>
         <Yireo_Webp>
-            <active>false</active>
+            <active>true</active>
             <codePool>community</codePool>
         </Yireo_Webp>
     </modules>

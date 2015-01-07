@@ -18,28 +18,32 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function enabled()
     {
-        static $enabled = null;
-        if($enabled === null) {
-
-            $config_enabled = (bool)Mage::getStoreConfig('web/webp/enabled');
-            $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
-
-            $browser = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : null;
-
-            $enabled = true;
-            if($config_enabled == false) {
-                $enabled = false;
-            } elseif(isset($_COOKIE['webp']) && $_COOKIE['webp'] == 1) {
-                $enabled = true;
-            } elseif(preg_match('/Chrome\/(9|10|11|12|13|14|15|16)/', $browser)) { 
-                $enabled = true;
-            } elseif(empty($cwebp)) {
-                $enabled = false;
-            } elseif(function_exists('exec') == false) {
-                $enabled = false;
-            }
+        $config_enabled = (bool)Mage::getStoreConfig('web/webp/enabled');
+        if($config_enabled == false) {
+            return false;
         }
-        return $enabled;
+
+        if(isset($_COOKIE['webp']) && $_COOKIE['webp'] == 1) {
+            return true;
+        }
+
+        $browser = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : null;
+        if(preg_match('/Chrome\/(9|10|11|12|13|14|15|16)/', $browser)) { 
+            return true;
+        }
+
+        // Check for GD support
+        if (function_exists('imagewebp')) {
+            return true;
+        }
+
+        // Check for potential cwebp execution
+        $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
+        if(!empty($cwebp) && function_exists('exec')) {
+            return true;
+        }
+
+        return false;
     }
 
     /*
@@ -70,34 +74,60 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
     /*
      * Method to convert an image to WebP
      */
-    public function convertToWebp($image)
+    public function convertToWebp($imagePath)
     {
-        if(empty($image) || !file_exists($image) || !is_readable($image)) {
-            return null;
+        if(empty($imagePath) || !file_exists($imagePath) || !is_readable($imagePath)) {
+            return;
+        }
+
+        if($this->enabled() == false) {
+            return;
         }
 
         // Detect alpha-transparency in PNG-images and skip it
-        if(preg_match('/\.png$/', $image)) {
+        if(preg_match('/\.png$/', $imagePath)) {
             $imageContents = @file_get_contents($image);
             $colorType = ord(@file_get_contents($image, NULL, NULL, 25, 1));
             if($colorType == 6 || $colorType == 4) {
-                return null;
+                return;
             } elseif(stripos($imageContents, 'PLTE') !== false && stripos($imageContents, 'tRNS') !== false) {
-                return null;
+                return;
             }
         }
 
         // Construct the new WebP image-name
-        $webp = preg_replace('/\.(png|jpg|jpeg)$/i', '.webp', $image);
+        $webpPath = preg_replace('/\.(png|jpg|jpeg)$/i', '.webp', $imagePath);
 
-        // Only do the following if the WebP image does not yet exist, or if the original PNG/JPEG seems to be updated
-        if((!file_exists($webp)) || (file_exists($image) && filemtime($image) > filemtime($webp))) {
-            $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
-            $cmd = $cwebp.' -quiet '.$image.' -o '.$webp;
-            exec($cmd, $output, $return);
+        // Check for the current WebP image
+        if(file_exists($webpPath) && filemtime($imagePath) < filemtime($webpPath)) {
+            return $webpPath;
         }
 
-        return $webp;
+        // GD function
+        if (function_exists('imagewebp')) {
+            if(preg_match('/\.png$/', $imagePath) && function_exists('imagecreatefrompng')) {
+                $image = imagecreatefrompng($imagePath);
+            } elseif(preg_match('/\.gif$/', $imagePath) && function_exists('imagecreatefromgif')) {
+                $image = imagecreatefromgif($imagePath);
+            } elseif(preg_match('/\.(jpg|jpeg)$/', $imagePath) && function_exists('imagecreatefromjpeg')) {
+                $image = imagecreatefromjpeg($imagePath);
+            } else {
+                return;
+            }
+
+            imagewebp($image, $webpPath);
+            return $webpPath;
+        }
+
+        // Only do the following if the WebP image does not yet exist, or if the original PNG/JPEG seems to be updated
+        if((!file_exists($webpPath)) || (file_exists($imagePath) && filemtime($imagePath) > filemtime($webpPath))) {
+            $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
+            $cmd = $cwebp.'  -quiet '.$imagePath.' -o '.$webpPath;
+            exec($cmd, $output, $return);
+            return $webpPath;
+        }
+
+        return;
     }
 
     public function getSystemPaths()

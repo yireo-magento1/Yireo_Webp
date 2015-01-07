@@ -1,2 +1,9 @@
 <?xml version="1.0"?>
-<layout/>
+<layout>
+    <default>
+        <reference name="head">
+            <action method="addCss" ifconfig="web/webp/load_css"><stylesheet>css/webp.css</stylesheet></action>
+            <action method="addJs" ifconfig="web/webp/load_jquery"><script>webp/jquery.js</script></action>
+        </reference>
+    </default>
+</layout>
