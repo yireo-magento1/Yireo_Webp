@@ -32,7 +32,7 @@
                         </enabled>
                         <cwebp_path translate="label">
                             <label>Path to cwebp</label>
-                            <comment><![CDATA[Path to the "cwebp" binary]]></comment>
+                            <comment><![CDATA[Example: "/usr/local/bin/cwebp"]]></comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>

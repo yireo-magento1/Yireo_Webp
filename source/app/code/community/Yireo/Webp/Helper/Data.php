@@ -38,7 +38,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Check for potential cwebp execution
-        $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
+        $cwebp = $this->getCwebpBinary();
         if(!empty($cwebp) && function_exists('exec')) {
             return true;
         }
@@ -60,6 +60,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
+        // The image already exists
         if(preg_match('/\.webp$/i', $image)) {
             return false;
         }
@@ -121,7 +122,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
 
         // Only do the following if the WebP image does not yet exist, or if the original PNG/JPEG seems to be updated
         if((!file_exists($webpPath)) || (file_exists($imagePath) && filemtime($imagePath) > filemtime($webpPath))) {
-            $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
+            $cwebp = $this->getCwebpBinary();
             $cmd = $cwebp.'  -quiet '.$imagePath.' -o '.$webpPath;
             exec($cmd, $output, $return);
             return $webpPath;
@@ -148,5 +149,19 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         );
 
         return $systemPaths;
+    }
+
+    public function getCwebpBinary()
+    {
+        $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
+        if (empty($cwebp)) {
+            return null;
+        }
+
+        if (preg_match('/\/$/', $cwebp)) {
+            return $cwebp.'cwebp';
+        }
+
+        return $cwebp;
     }
 }
