@@ -13,7 +13,7 @@
 
     <modules>
         <Yireo_Webp>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </Yireo_Webp>
     </modules>
 
@@ -65,7 +65,9 @@
                 <enabled>1</enabled>
                 <load_css>0</load_css>
                 <load_jquery>1</load_jquery>
+                <cwebp_enabled>1</cwebp_enabled>
                 <cwebp_path></cwebp_path>
+                <gd_enabled>1</gd_enabled>
             </webp>
         </web>
     </default>

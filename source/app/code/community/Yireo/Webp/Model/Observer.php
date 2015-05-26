@@ -10,10 +10,9 @@
 
 class Yireo_Webp_Model_Observer
 {
-    /*
+    /**
      * Listen to the event core_block_abstract_to_html_after
      * 
-     * @access public
      * @parameter Varien_Event_Observer $observer
      * @return $this
      */
@@ -28,9 +27,8 @@ class Yireo_Webp_Model_Observer
         $systemPaths = Mage::helper('webp')->getSystemPaths();
 
         $allowedBlocks = array('root');
-        //$allowedBlocks = array('root', 'content');
+
         if(in_array($block->getNameInLayout(), $allowedBlocks)) {
-            $layout = Mage::app()->getLayout();
             $html = $transport->getHtml();
 
             $newHtml = array();
@@ -86,7 +84,8 @@ class Yireo_Webp_Model_Observer
                 if(!empty($imageList)) {
                     $newHtml[] = '<script>';
                     $newHtml[] = 'var SKIN_URL = \''.Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'\';';
-                    $webpCookie = (isset($_COOKIE['webp'])) ? (int)$_COOKIE['webp'] : 0 ;
+                    $webpCookie = (isset($_COOKIE['webp'])) ? (int)$_COOKIE['webp'] : 0;
+
                     $newHtml[] = 'var WEBP_COOKIE = '.$webpCookie.';';
                     $newHtml[] = 'if(webpReplacements == null) { var webpReplacements = new Object(); }';
                     foreach($imageList as $name => $value) {

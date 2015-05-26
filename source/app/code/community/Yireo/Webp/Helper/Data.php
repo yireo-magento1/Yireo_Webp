@@ -13,8 +13,10 @@
  */
 class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    /*
+    /**
      * Method to check whether this extension is enabled
+     *
+     * @return bool
      */
     public function enabled()
     {
@@ -33,21 +35,25 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Check for GD support
-        if (function_exists('imagewebp')) {
+        if (Mage::getStoreConfig('web/webp/gd_enabled') == 1 && function_exists('imagewebp')) {
             return true;
         }
 
         // Check for potential cwebp execution
         $cwebp = $this->getCwebpBinary();
-        if(!empty($cwebp) && function_exists('exec')) {
+        if(Mage::getStoreConfig('web/webp/cwebp_enabled') == 1 &&  !empty($cwebp) && function_exists('exec')) {
             return true;
         }
 
         return false;
     }
 
-    /*
+    /**
      * Method to check whether WebP should actually be introduced
+     *
+     * @param string $image
+     *
+     * @return bool
      */
     public function allowWebp($image)
     {
@@ -72,17 +78,20 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         return false;
     }
 
-    /*
+    /**
      * Method to convert an image to WebP
+     *
+     * @param string $imagePath
+     * @return string
      */
     public function convertToWebp($imagePath)
     {
         if(empty($imagePath) || !file_exists($imagePath) || !is_readable($imagePath)) {
-            return;
+            return null;
         }
 
         if($this->enabled() == false) {
-            return;
+            return null;
         }
 
         // Detect alpha-transparency in PNG-images and skip it
@@ -90,9 +99,9 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             $imageContents = @file_get_contents($image);
             $colorType = ord(@file_get_contents($image, NULL, NULL, 25, 1));
             if($colorType == 6 || $colorType == 4) {
-                return;
+                return null;
             } elseif(stripos($imageContents, 'PLTE') !== false && stripos($imageContents, 'tRNS') !== false) {
-                return;
+                return null;
             }
         }
 
@@ -105,7 +114,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // GD function
-        if (function_exists('imagewebp')) {
+        if (Mage::getStoreConfig('web/webp/gd_enabled') == 1 && function_exists('imagewebp')) {
             if(preg_match('/\.png$/', $imagePath) && function_exists('imagecreatefrompng')) {
                 $image = imagecreatefrompng($imagePath);
             } elseif(preg_match('/\.gif$/', $imagePath) && function_exists('imagecreatefromgif')) {
@@ -113,7 +122,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             } elseif(preg_match('/\.(jpg|jpeg)$/', $imagePath) && function_exists('imagecreatefromjpeg')) {
                 $image = imagecreatefromjpeg($imagePath);
             } else {
-                return;
+                return null;
             }
 
             imagewebp($image, $webpPath);
@@ -121,16 +130,21 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Only do the following if the WebP image does not yet exist, or if the original PNG/JPEG seems to be updated
-        if((!file_exists($webpPath)) || (file_exists($imagePath) && filemtime($imagePath) > filemtime($webpPath))) {
+        if(Mage::getStoreConfig('web/webp/cwebp_enabled') == 1) {
             $cwebp = $this->getCwebpBinary();
             $cmd = $cwebp.'  -quiet '.$imagePath.' -o '.$webpPath;
             exec($cmd, $output, $return);
             return $webpPath;
         }
 
-        return;
+        return null;
     }
 
+    /**
+     * Return all the system paths
+     *
+     * @return array
+     */
     public function getSystemPaths()
     {
         $systemPaths = array(
@@ -151,6 +165,11 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         return $systemPaths;
     }
 
+    /**
+     * Get the path to the "cwebp" binary
+     *
+     * @return string
+     */
     public function getCwebpBinary()
     {
         $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
