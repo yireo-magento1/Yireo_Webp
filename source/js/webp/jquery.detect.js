@@ -22,7 +22,7 @@ if(hasWebp == false) {
   };
 
   var WebPTest = 'UklGRkYAAABXRUJQVlA4IDoAAABwAgCdASoEAAQAAYcIhYWIhYSIiQIADAzdrBLeABAAAAEAAAEAAPKn5Nn/0v8//Zxn/6H3QAAAAAA=';
-  Tester.src = SKIN_URL + '/frontend/default/default/images/test.webp';
+  Tester.src = SKIN_URL + '/frontend/default/default/images/webp/test.webp';
 }
 
 if(webpReplacements) {
