@@ -12,7 +12,7 @@ class Yireo_Webp_Model_Observer
 {
     /**
      * Listen to the event core_block_abstract_to_html_after
-     * 
+     *
      * @parameter Varien_Event_Observer $observer
      * @return $this
      */
@@ -84,7 +84,7 @@ class Yireo_Webp_Model_Observer
                 if(!empty($imageList)) {
                     $newHtml[] = '<script>';
                     $newHtml[] = 'var SKIN_URL = \''.Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'\';';
-                    $webpCookie = (isset($_COOKIE['webp'])) ? (int)$_COOKIE['webp'] : 0;
+                    $webpCookie = (int)Mage::app()->getRequest()->getCookie('webp', 0);
 
                     $newHtml[] = 'var WEBP_COOKIE = '.$webpCookie.';';
                     $newHtml[] = 'if(webpReplacements == null) { var webpReplacements = new Object(); }';

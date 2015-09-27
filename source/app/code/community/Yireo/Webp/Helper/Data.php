@@ -20,12 +20,17 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function enabled()
     {
+        if ((bool)Mage::getStoreConfig('advanced/modules_disable_output/Yireo_WebP')) {
+            return false;
+        }
+
         $config_enabled = (bool)Mage::getStoreConfig('web/webp/enabled');
         if($config_enabled == false) {
             return false;
         }
 
-        if(isset($_COOKIE['webp']) && $_COOKIE['webp'] == 1) {
+        $webpCookie = (int)Mage::app()->getRequest()->getCookie('webp', 0);
+        if($webpCookie == 1) {
             return true;
         }
 
