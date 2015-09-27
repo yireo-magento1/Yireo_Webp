@@ -7,9 +7,10 @@ php:
   - nightly
 
 before_script:
+  - composer self-update
   - composer install --dev
   - pyrus install -f pear/PHP_CodeSniffer
   - phpenv rehash
 
 script:
-  - vendor/bin/phpcs --standard=./phpcs.xml -sv --encoding=utf-8 ./source
+  - phpcs --standard=./phpcs.xml -sv --encoding=utf-8 ./source
