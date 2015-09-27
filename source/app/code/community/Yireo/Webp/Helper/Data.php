@@ -92,11 +92,11 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
     public function convertToWebp($imagePath)
     {
         if(empty($imagePath) || !file_exists($imagePath) || !is_readable($imagePath)) {
-            return null;
+            return;
         }
 
         if($this->enabled() == false) {
-            return null;
+            return;
         }
 
         // Detect alpha-transparency in PNG-images and skip it
@@ -104,9 +104,9 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             $imageContents = file_get_contents($image);
             $colorType = ord(file_get_contents($image, NULL, NULL, 25, 1));
             if($colorType == 6 || $colorType == 4) {
-                return null;
+                return;
             } elseif(stripos($imageContents, 'PLTE') !== false && stripos($imageContents, 'tRNS') !== false) {
-                return null;
+                return;
             }
         }
 
@@ -127,7 +127,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             } elseif(preg_match('/\.(jpg|jpeg)$/', $imagePath) && function_exists('imagecreatefromjpeg')) {
                 $image = imagecreatefromjpeg($imagePath);
             } else {
-                return null;
+                return;
             }
 
             imagewebp($image, $webpPath);
@@ -142,7 +142,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return $webpPath;
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -179,7 +179,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
         if (empty($cwebp)) {
-            return null;
+            return;
         }
 
         if (preg_match('/\/$/', $cwebp)) {
