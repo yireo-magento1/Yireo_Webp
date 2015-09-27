@@ -8,11 +8,11 @@
   
 var hasWebp = false;
 
-if(WEBP_COOKIE == 1) {
+if(typeof WEBP_COOKIE !== 'undefined' && WEBP_COOKIE == 1) {
   hasWebp = true;
 }
 
-if(hasWebp == false) {
+if(typeof SKIN_URL !== 'undefined' && hasWebp == false) {
   var Tester = new Image();
   Tester.onload = function(){
     if(Tester.width > 0 && Tester.height > 0){
@@ -25,7 +25,7 @@ if(hasWebp == false) {
   Tester.src = SKIN_URL + '/frontend/default/default/images/webp/test.webp';
 }
 
-if(webpReplacements) {
+if(typeof webpReplacements !== 'undefined') {
   jQuery('img').each(function(img) {
     dataImg = jQuery(this).attr('data-img');
     if(dataImg && webpReplacements[dataImg]) {
