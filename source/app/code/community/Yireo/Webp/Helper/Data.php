@@ -34,7 +34,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return true;
         }
 
-        $browser = (isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : null;
+        $browser = Mage::helper('core/http')->getHttpUserAgent();
         if(preg_match('/Chrome\/(9|10|11|12|13|14|15|16)/', $browser)) { 
             return true;
         }
