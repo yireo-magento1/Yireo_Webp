@@ -1,10 +1,10 @@
 <?php
 /**
- * Yireo Webp for Magento 
+ * Yireo Webp for Magento
  *
  * @package     Yireo_Webp
- * @author      Yireo (http://www.yireo.com/)
- * @copyright   Copyright 2015 Yireo (http://www.yireo.com/)
+ * @author      Yireo <info@yireo.com>
+ * @copyright   2015 Yireo <https://www.yireo.com/>
  * @license     Open Source License (OSL v3)
  */
 
