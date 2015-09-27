@@ -8,8 +8,9 @@ php:
 before_script:
   - composer self-update
   - composer install --dev
+  - composer require magento-ecg/coding-standard
   - pyrus install -f pear/PHP_CodeSniffer
   - phpenv rehash
 
 script:
-  - phpcs --standard=./phpcs.xml -sv --encoding=utf-8 ./source
+  - phpcs --standard=./vendor/magento-ecg/coding-standard -sv --encoding=utf-8 ./source
