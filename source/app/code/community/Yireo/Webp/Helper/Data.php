@@ -101,8 +101,8 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
 
         // Detect alpha-transparency in PNG-images and skip it
         if(preg_match('/\.png$/', $imagePath)) {
-            $imageContents = @file_get_contents($image);
-            $colorType = ord(@file_get_contents($image, NULL, NULL, 25, 1));
+            $imageContents = file_get_contents($image);
+            $colorType = ord(file_get_contents($image, NULL, NULL, 25, 1));
             if($colorType == 6 || $colorType == 4) {
                 return null;
             } elseif(stripos($imageContents, 'PLTE') !== false && stripos($imageContents, 'tRNS') !== false) {
