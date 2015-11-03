@@ -10,6 +10,17 @@
 
 class Yireo_Webp_Model_Observer
 {
+    protected function isAllowedBlock($block)
+    {
+        $allowedBlocks = array('root');
+
+        if(in_array($block->getNameInLayout(), $allowedBlocks)) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Listen to the event core_block_abstract_to_html_after
      *
@@ -18,17 +29,15 @@ class Yireo_Webp_Model_Observer
      */
     public function coreBlockAbstractToHtmlAfter($observer)
     {
-        if(Mage::helper('webp')->enabled() == false) {
+        if($this->getHelper()->enabled() == false) {
             return $this;
         }
 
         $transport = $observer->getEvent()->getTransport();
         $block = $observer->getEvent()->getBlock();
-        $systemPaths = Mage::helper('webp')->getSystemPaths();
+        $systemPaths = $this->getHelper()->getSystemPaths();
 
-        $allowedBlocks = array('root');
-
-        if(in_array($block->getNameInLayout(), $allowedBlocks)) {
+        if($this->isAllowedBlock($block)) {
             $html = $transport->getHtml();
 
             $newHtml = array();
@@ -50,15 +59,15 @@ class Yireo_Webp_Model_Observer
                     }
 
                     // If this failed, don't continue
-                    if(!file_exists($imagePath)) {
+                    if(!$this->getFileHelper()->exists($imagePath)) {
                         continue;
                     }
     
                     // Construct the new WebP image-name
-                    $webpPath = Mage::helper('webp')->convertToWebp($imagePath);
+                    $webpPath = $this->getHelper()->convertToWebp($imagePath);
 
                     // If this failed, don't continue
-                    if(empty($webpPath) || file_exists($webpPath) == false) {
+                    if(empty($webpPath) || $this->getFileHelper()->exists($webpPath) == false) {
                         continue;
                     }
 
@@ -110,5 +119,25 @@ class Yireo_Webp_Model_Observer
         }
 
         return $this;
+    }
+
+    /**
+     * Return the helper class
+     *
+     * @return Yireo_Webp_Helper_Data 
+     */
+    public function getHelper()
+    {
+        return Mage::helper('webp');
+    }
+
+    /**
+     * Return the file helper class
+     *
+     * @return Yireo_Webp_Helper_File
+     */
+    public function getFileHelper()
+    {
+        return Mage::helper('webp/file');
     }
 }

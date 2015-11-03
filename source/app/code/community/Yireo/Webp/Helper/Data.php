@@ -25,17 +25,19 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         $config_enabled = (bool)Mage::getStoreConfig('web/webp/enabled');
-        if($config_enabled == false) {
+        if ($config_enabled == false) {
             return false;
         }
 
         $webpCookie = (int)Mage::app()->getRequest()->getCookie('webp', 0);
-        if($webpCookie == 1) {
+        if ($webpCookie == 1) {
             return true;
         }
 
-        $browser = Mage::helper('core/http')->getHttpUserAgent();
-        if(preg_match('/Chrome\/(9|10|11|12|13|14|15|16)/', $browser)) { 
+        /** @var Mage_Core_Helper_Http $httpHelper */
+        $httpHelper = Mage::helper('core/http');
+        $browser = $httpHelper->getHttpUserAgent();
+        if (preg_match('/Chrome\/(9|10|11|12|13|14|15|16)/', $browser)) {
             return true;
         }
 
@@ -46,7 +48,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
 
         // Check for potential cwebp execution
         $cwebp = $this->getCwebpBinary();
-        if(Mage::getStoreConfig('web/webp/cwebp_enabled') == 1 &&  !empty($cwebp) && function_exists('exec')) {
+        if (Mage::getStoreConfig('web/webp/cwebp_enabled') == 1 && !empty($cwebp) && function_exists('exec')) {
             return true;
         }
 
@@ -63,20 +65,20 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
     public function allowWebp($image)
     {
         $enabled = $this->enabled();
-        if($enabled == false) {
+        if ($enabled == false) {
             return false;
         }
 
-        if(empty($image)) {
+        if (empty($image)) {
             return false;
         }
 
         // The image already exists
-        if(preg_match('/\.webp$/i', $image)) {
+        if (preg_match('/\.webp$/i', $image)) {
             return false;
         }
 
-        if(!is_writable(dirname($image))) {
+        if (!$this->getFileHelper()->isWritableDir($image)) {
             return false;
         }
 
@@ -87,62 +89,125 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      * Method to convert an image to WebP
      *
      * @param string $imagePath
+     *
      * @return string
      */
     public function convertToWebp($imagePath)
     {
-        if(empty($imagePath) || !file_exists($imagePath) || !is_readable($imagePath)) {
-            return;
+        if (empty($imagePath) || !$this->getFileHelper()->exists($imagePath)) {
+            return null;
         }
 
-        if($this->enabled() == false) {
-            return;
+        if ($this->enabled() == false) {
+            return null;
         }
 
         // Detect alpha-transparency in PNG-images and skip it
-        if(preg_match('/\.png$/', $imagePath)) {
-            $imageContents = file_get_contents($image);
-            $colorType = ord(file_get_contents($image, NULL, NULL, 25, 1));
-            if($colorType == 6 || $colorType == 4) {
-                return;
-            } elseif(stripos($imageContents, 'PLTE') !== false && stripos($imageContents, 'tRNS') !== false) {
-                return;
-            }
+        if ($this->hasAlphaTransparency($imagePath)) {
+            return null;
         }
 
         // Construct the new WebP image-name
-        $webpPath = preg_replace('/\.(png|jpg|jpeg)$/i', '.webp', $imagePath);
+        $webpPath = $this->getWebpNameFromImage($imagePath);
 
         // Check for the current WebP image
-        if(file_exists($webpPath) && filemtime($imagePath) < filemtime($webpPath)) {
+        if ($this->getFileHelper()->exists($webpPath) && $this->getFileHelper()->isNewerThan($webpPath, $imagePath)) {
             return $webpPath;
         }
 
         // GD function
+        $webpPath = $this->convertToWebpViaGd($imagePath, $webpPath);
+        if ($this->getFileHelper()->exists($webpPath)) {
+            return $webpPath;
+        }
+
+        // Only do the following if the WebP image does not yet exist, or if the original PNG/JPEG seems to be updated
+        return $this->convertToWebpViaBinary($imagePath, $webpPath);
+    }
+
+    /**
+     * Method to convert an image to WebP using the GD method
+     *
+     * @param $imagePath
+     * @param $webpPath
+     *
+     * @return bool
+     */
+    public function convertToWebpViaGd($imagePath, $webpPath)
+    {
         if (Mage::getStoreConfig('web/webp/gd_enabled') == 1 && function_exists('imagewebp')) {
-            if(preg_match('/\.png$/', $imagePath) && function_exists('imagecreatefrompng')) {
+            if (preg_match('/\.png$/', $imagePath) && function_exists('imagecreatefrompng')) {
                 $image = imagecreatefrompng($imagePath);
-            } elseif(preg_match('/\.gif$/', $imagePath) && function_exists('imagecreatefromgif')) {
+            } elseif (preg_match('/\.gif$/', $imagePath) && function_exists('imagecreatefromgif')) {
                 $image = imagecreatefromgif($imagePath);
-            } elseif(preg_match('/\.(jpg|jpeg)$/', $imagePath) && function_exists('imagecreatefromjpeg')) {
+            } elseif (preg_match('/\.(jpg|jpeg)$/', $imagePath) && function_exists('imagecreatefromjpeg')) {
                 $image = imagecreatefromjpeg($imagePath);
             } else {
-                return;
+                return false;
             }
 
             imagewebp($image, $webpPath);
             return $webpPath;
         }
 
-        // Only do the following if the WebP image does not yet exist, or if the original PNG/JPEG seems to be updated
-        if(Mage::getStoreConfig('web/webp/cwebp_enabled') == 1) {
+        return false;
+    }
+
+    /**
+     * Method to convert an image to WebP using the binary method
+     *
+     * @param $imagePath
+     * @param $webpPath
+     *
+     * @return bool
+     */
+    public function convertToWebpViaBinary($imagePath, $webpPath)
+    {
+        if (Mage::getStoreConfig('web/webp/cwebp_enabled') == 1) {
             $cwebp = $this->getCwebpBinary();
-            $cmd = $cwebp.'  -quiet '.$imagePath.' -o '.$webpPath;
+            $cmd = $cwebp . '  -quiet ' . $imagePath . ' -o ' . $webpPath;
             exec($cmd, $output, $return);
+
             return $webpPath;
         }
 
-        return;
+        return false;
+    }
+
+    /**
+     * Detect whether an image has PNG alpha transparency
+     *
+     * @param $image
+     *
+     * @return bool
+     */
+    public function hasAlphaTransparency($image)
+    {
+        if (preg_match('/\.png$/', $image)) {
+            $fileIo = new Varien_Io_File();
+            $imageContents = $fileIo->read($image);
+            $colorType = ord(substr($imageContents, 25, 1));
+
+            if ($colorType == 6 || $colorType == 4) {
+                return true;
+            } elseif (stripos($imageContents, 'PLTE') !== false && stripos($imageContents, 'tRNS') !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the WebP path equivalent of an image path
+     *
+     * @param $image
+     *
+     * @return mixed
+     */
+    public function getWebpNameFromImage($image)
+    {
+        return preg_replace('/\.(png|jpg|jpeg)$/i', '.webp', $image);
     }
 
     /**
@@ -179,13 +244,24 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
         if (empty($cwebp)) {
-            return;
+            return null;
         }
 
         if (preg_match('/\/$/', $cwebp)) {
-            return $cwebp.'cwebp';
+            return $cwebp . 'cwebp';
         }
 
         return $cwebp;
+    }
+
+
+    /**
+     * Return the file helper class
+     *
+     * @return Yireo_Webp_Helper_File
+     */
+    public function getFileHelper()
+    {
+        return Mage::helper('webp/file');
     }
 }
