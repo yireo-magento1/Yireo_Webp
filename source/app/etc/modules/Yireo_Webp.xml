@@ -12,7 +12,7 @@
 <config>
     <modules>
         <Yireo_Webp>
-            <active>false</active>
+            <active>true</active>
             <codePool>community</codePool>
         </Yireo_Webp>
     </modules>

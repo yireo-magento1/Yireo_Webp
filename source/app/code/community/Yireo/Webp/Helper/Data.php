@@ -14,30 +14,38 @@
 class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /**
+     * @var Yireo_Webp_Helper_File
+     */
+    protected $fileHelper;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->fileHelper = Mage::helper('webp/file');
+    }
+
+    /**
      * Method to check whether this extension is enabled
      *
      * @return bool
      */
     public function enabled()
     {
-        if ((bool)Mage::getStoreConfig('advanced/modules_disable_output/Yireo_WebP')) {
+        if ($this->isModuleEnabled() == false) {
             return false;
         }
 
-        $config_enabled = (bool)Mage::getStoreConfig('web/webp/enabled');
-        if ($config_enabled == false) {
-            return false;
-        }
-
-        $webpCookie = (int)Mage::app()->getRequest()->getCookie('webp', 0);
+        $webpCookie = (int)Mage::app()
+            ->getRequest()
+            ->getCookie('webp', 0);
         if ($webpCookie == 1) {
             return true;
         }
 
         /** @var Mage_Core_Helper_Http $httpHelper */
-        $httpHelper = Mage::helper('core/http');
-        $browser = $httpHelper->getHttpUserAgent();
-        if (preg_match('/Chrome\/(9|10|11|12|13|14|15|16)/', $browser)) {
+        if ($this->isChromeBrowser()) {
             return true;
         }
 
@@ -53,6 +61,35 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return false;
+    }
+
+    protected function isChromeBrowser()
+    {
+        /** @var Mage_Core_Helper_Http $httpHelper */
+        $httpHelper = Mage::helper('core/http');
+        $browser = $httpHelper->getHttpUserAgent();
+        if (preg_match('/Chrome\/(9|10|11|12|13|14|15|16)/', $browser)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isModuleEnabled()
+    {
+        if ((bool)Mage::getStoreConfig('advanced/modules_disable_output/Yireo_WebP')) {
+            return false;
+        }
+
+        $config_enabled = (bool)Mage::getStoreConfig('web/webp/enabled');
+        if ($config_enabled == false) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -78,7 +115,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        if (!$this->getFileHelper()->isWritableDir($image)) {
+        if (!$this->fileHelper->isWritableDir($image)) {
             return false;
         }
 
@@ -94,7 +131,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function convertToWebp($imagePath)
     {
-        if (empty($imagePath) || !$this->getFileHelper()->exists($imagePath)) {
+        if (empty($imagePath) || !$this->fileHelper->exists($imagePath)) {
             return null;
         }
 
@@ -111,13 +148,13 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         $webpPath = $this->getWebpNameFromImage($imagePath);
 
         // Check for the current WebP image
-        if ($this->getFileHelper()->exists($webpPath) && $this->getFileHelper()->isNewerThan($webpPath, $imagePath)) {
+        if ($this->fileHelper->exists($webpPath) && $this->fileHelper->isNewerThan($webpPath, $imagePath)) {
             return $webpPath;
         }
 
         // GD function
         $webpPath = $this->convertToWebpViaGd($imagePath, $webpPath);
-        if ($this->getFileHelper()->exists($webpPath)) {
+        if ($this->fileHelper->exists($webpPath)) {
             return $webpPath;
         }
 
@@ -147,6 +184,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             imagewebp($image, $webpPath);
+
             return $webpPath;
         }
 
@@ -220,17 +258,13 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         $systemPaths = array(
             'skin' => array(
                 'url' => Mage::getBaseUrl('skin'),
-                'path' => Mage::getBaseDir('skin'),
-            ),
+                'path' => Mage::getBaseDir('skin'),),
             'media' => array(
                 'url' => Mage::getBaseUrl('media'),
-                'path' => Mage::getBaseDir('media'),
-            ),
+                'path' => Mage::getBaseDir('media'),),
             'base' => array(
                 'url' => Mage::getBaseUrl(),
-                'path' => Mage::getBaseDir('base'),
-            ),
-        );
+                'path' => Mage::getBaseDir('base'),),);
 
         return $systemPaths;
     }
@@ -242,7 +276,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getCwebpBinary()
     {
-        $cwebp = Mage::getStoreConfig('web/webp/cwebp_path');
+        $cwebp = $this->getCwebpPath();
         if (empty($cwebp)) {
             return null;
         }
@@ -254,14 +288,11 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         return $cwebp;
     }
 
-
     /**
-     * Return the file helper class
-     *
-     * @return Yireo_Webp_Helper_File
+     * @return mixed
      */
-    public function getFileHelper()
+    protected function getCwebpPath()
     {
-        return Mage::helper('webp/file');
+        return Mage::getStoreConfig('web/webp/cwebp_path');
     }
 }
