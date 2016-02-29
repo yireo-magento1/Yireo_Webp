@@ -37,10 +37,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        $webpCookie = (int)Mage::app()
-            ->getRequest()
-            ->getCookie('webp', 0);
-        if ($webpCookie == 1) {
+        if ($this->hasWebpCookieEnabled()) {
             return true;
         }
 
@@ -50,19 +47,74 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Check for GD support
-        if (Mage::getStoreConfig('web/webp/gd_enabled') == 1 && function_exists('imagewebp')) {
+        if ($this->hasGdSupport()) {
             return true;
         }
 
         // Check for potential cwebp execution
-        $cwebp = $this->getCwebpBinary();
-        if (Mage::getStoreConfig('web/webp/cwebp_enabled') == 1 && !empty($cwebp) && function_exists('exec')) {
+        if ($this->hasBinarySupport()) {
             return true;
         }
 
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    protected function hasWebpCookieEnabled()
+    {
+        $webpCookie = (int)Mage::app()
+            ->getRequest()
+            ->getCookie('webp', 0);
+
+        if ($webpCookie == 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasBinarySupport()
+    {
+        if (Mage::getStoreConfig('web/webp/cwebp_enabled') == 0) {
+            return false;
+        }
+
+        $cwebp = $this->getCwebpBinary();
+        if (empty($cwebp)) {
+            return false;
+        }
+
+        if (function_exists('exec') == false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasGdSupport()
+    {
+        if (Mage::getStoreConfig('web/webp/gd_enabled') == 0) {
+            return false;
+        }
+
+        if (!function_exists('imagewebp')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
     protected function isChromeBrowser()
     {
         /** @var Mage_Core_Helper_Http $httpHelper */
@@ -131,17 +183,21 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function convertToWebp($imagePath)
     {
-        if (empty($imagePath) || !$this->fileHelper->exists($imagePath)) {
-            return null;
+        if (empty($imagePath)) {
+            return false;
+        }
+
+        if (!$this->fileHelper->exists($imagePath)) {
+            return false;
         }
 
         if ($this->enabled() == false) {
-            return null;
+            return false;
         }
 
         // Detect alpha-transparency in PNG-images and skip it
         if ($this->hasAlphaTransparency($imagePath)) {
-            return null;
+            return false;
         }
 
         // Construct the new WebP image-name
@@ -172,23 +228,23 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function convertToWebpViaGd($imagePath, $webpPath)
     {
-        if (Mage::getStoreConfig('web/webp/gd_enabled') == 1 && function_exists('imagewebp')) {
-            if (preg_match('/\.png$/', $imagePath) && function_exists('imagecreatefrompng')) {
-                $image = imagecreatefrompng($imagePath);
-            } elseif (preg_match('/\.gif$/', $imagePath) && function_exists('imagecreatefromgif')) {
-                $image = imagecreatefromgif($imagePath);
-            } elseif (preg_match('/\.(jpg|jpeg)$/', $imagePath) && function_exists('imagecreatefromjpeg')) {
-                $image = imagecreatefromjpeg($imagePath);
-            } else {
-                return false;
-            }
-
-            imagewebp($image, $webpPath);
-
-            return $webpPath;
+        if ($this->hasGdSupport() == false) {
+            return false;
         }
 
-        return false;
+        if (preg_match('/\.png$/', $imagePath) && function_exists('imagecreatefrompng')) {
+            $image = imagecreatefrompng($imagePath);
+        } elseif (preg_match('/\.gif$/', $imagePath) && function_exists('imagecreatefromgif')) {
+            $image = imagecreatefromgif($imagePath);
+        } elseif (preg_match('/\.(jpg|jpeg)$/', $imagePath) && function_exists('imagecreatefromjpeg')) {
+            $image = imagecreatefromjpeg($imagePath);
+        } else {
+            return false;
+        }
+
+        imagewebp($image, $webpPath);
+
+        return $webpPath;
     }
 
     /**
@@ -201,15 +257,15 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function convertToWebpViaBinary($imagePath, $webpPath)
     {
-        if (Mage::getStoreConfig('web/webp/cwebp_enabled') == 1) {
-            $cwebp = $this->getCwebpBinary();
-            $cmd = $cwebp . '  -quiet ' . $imagePath . ' -o ' . $webpPath;
-            exec($cmd, $output, $return);
-
-            return $webpPath;
+        if ($this->hasBinarySupport() == false) {
+            return false;
         }
 
-        return false;
+        $cwebp = $this->getCwebpBinary();
+        $cmd = $cwebp . '  -quiet ' . $imagePath . ' -o ' . $webpPath;
+        exec($cmd, $output, $return);
+
+        return $webpPath;
     }
 
     /**
@@ -221,16 +277,29 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function hasAlphaTransparency($image)
     {
-        if (preg_match('/\.png$/', $image)) {
-            $fileIo = new Varien_Io_File();
-            $imageContents = $fileIo->read($image);
-            $colorType = ord(substr($imageContents, 25, 1));
+        if (empty($image)) {
+            return false;
+        }
 
-            if ($colorType == 6 || $colorType == 4) {
-                return true;
-            } elseif (stripos($imageContents, 'PLTE') !== false && stripos($imageContents, 'tRNS') !== false) {
-                return true;
-            }
+        if ($this->fileHelper->exists($image) == false) {
+            return false;
+        }
+
+        if (preg_match('/\.png$/', $image)) {
+            return false;
+        }
+
+        $fileIo = new Yireo_Webp_Lib_Io_File();
+        $fileIo->setCwd(dirname($image));
+        $fileIo->setIwd(dirname($image));
+
+        $imageContents = $fileIo->read($image);
+        $colorType = ord(substr($imageContents, 25, 1));
+
+        if ($colorType == 6 || $colorType == 4) {
+            return true;
+        } elseif (stripos($imageContents, 'PLTE') !== false && stripos($imageContents, 'tRNS') !== false) {
+            return true;
         }
 
         return false;
@@ -258,13 +327,13 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         $systemPaths = array(
             'skin' => array(
                 'url' => Mage::getBaseUrl('skin'),
-                'path' => Mage::getBaseDir('skin'),),
+                'path' => Mage::getBaseDir('skin')),
             'media' => array(
                 'url' => Mage::getBaseUrl('media'),
-                'path' => Mage::getBaseDir('media'),),
+                'path' => Mage::getBaseDir('media')),
             'base' => array(
                 'url' => Mage::getBaseUrl(),
-                'path' => Mage::getBaseDir('base'),),);
+                'path' => Mage::getBaseDir('base')));
 
         return $systemPaths;
     }

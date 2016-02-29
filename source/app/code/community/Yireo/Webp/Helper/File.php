@@ -21,6 +21,10 @@ class Yireo_Webp_Helper_File extends Mage_Core_Helper_Abstract
      */
     public function exists($file)
     {
+        if (file_exists($file)) {
+            return true;
+        }
+
         $validator = new Zend_Validate_File_Exists();
 
         if ($validator->isValid($file) == true) {
