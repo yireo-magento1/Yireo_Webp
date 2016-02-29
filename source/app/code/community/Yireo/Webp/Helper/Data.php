@@ -327,13 +327,13 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         $systemPaths = array(
             'skin' => array(
                 'url' => Mage::getBaseUrl('skin'),
-                'path' => Mage::getBaseDir('skin')),
+                'path' => Mage::getBaseDir('skin').DS),
             'media' => array(
                 'url' => Mage::getBaseUrl('media'),
-                'path' => Mage::getBaseDir('media')),
+                'path' => Mage::getBaseDir('media').DS),
             'base' => array(
                 'url' => Mage::getBaseUrl(),
-                'path' => Mage::getBaseDir('base')));
+                'path' => Mage::getBaseDir('base').DS));
 
         return $systemPaths;
     }

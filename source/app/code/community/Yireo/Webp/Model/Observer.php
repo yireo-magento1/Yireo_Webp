@@ -95,7 +95,7 @@ class Yireo_Webp_Model_Observer
         }
 
         // Add a JavaScript-list to the HTML-document
-        if (!empty($imageList)) {
+        if (empty($imageList)) {
             return $this;
         }
 
@@ -156,6 +156,8 @@ class Yireo_Webp_Model_Observer
      */
     protected function getScriptHtmlLines($imageList)
     {
+        $newHtml = array();
+
         $newHtml[] = '<script>';
         $newHtml[] = 'var SKIN_URL = \'' . Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . '\';';
         $webpCookie = (int)Mage::app()->getRequest()->getCookie('webp', 0);
@@ -181,7 +183,7 @@ class Yireo_Webp_Model_Observer
 
         foreach ($systemPaths as $systemPath) {
             if (strstr($imagePath, $systemPath['path'])) {
-                return str_replace($systemPath['path'], $systemPath['url'] . DS, $imagePath);
+                return str_replace($systemPath['path'], $systemPath['url'], $imagePath);
             }
         }
     }
@@ -198,7 +200,7 @@ class Yireo_Webp_Model_Observer
         if (preg_match('/^http/', $imageUrl)) {
             foreach ($systemPaths as $systemPath) {
                 if (strstr($imageUrl, $systemPath['url'])) {
-                    return str_replace($systemPath['url'], $systemPath['path'] . DS, $imageUrl);
+                    return str_replace($systemPath['url'], $systemPath['path'], $imageUrl);
                 }
             }
         }
