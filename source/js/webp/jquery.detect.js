@@ -1,8 +1,8 @@
 /**
  * Yireo Webp for Magento
  *
- * @author      Yireo (http://www.yireo.com/)
- * @copyright   Copyright (c) 2015 Yireo (http://www.yireo.com/)
+ * @author      Yireo (https://www.yireo.com/)
+ * @copyright   Copyright (c) 2015 Yireo (https://www.yireo.com/)
  * @license     GNU General Public License
  */
   
