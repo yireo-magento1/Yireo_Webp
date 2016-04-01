@@ -9,7 +9,7 @@
  */
 
 /**
- * Webp helper
+ * Webp version
  */
 class Yireo_Webp_Block_Adminhtml_System_Config_Field_Gd extends Mage_Adminhtml_Block_System_Config_Form_Field
 {

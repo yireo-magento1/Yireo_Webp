@@ -31,9 +31,9 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return bool
      */
-    public function enabled()
+    public function canUse()
     {
-        if ($this->isModuleEnabled() == false) {
+        if ($this->isEnabled() == false) {
             return false;
         }
 
@@ -130,7 +130,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
-    public function isModuleEnabled()
+    public function isEnabled()
     {
         if ((bool)Mage::getStoreConfig('advanced/modules_disable_output/Yireo_WebP')) {
             return false;
@@ -153,8 +153,8 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function allowWebp($image)
     {
-        $enabled = $this->enabled();
-        if ($enabled == false) {
+        $canUse = $this->canUse();
+        if ($canUse == false) {
             return false;
         }
 
@@ -191,7 +191,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        if ($this->enabled() == false) {
+        if ($this->canUse() == false) {
             return false;
         }
 

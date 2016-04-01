@@ -57,7 +57,7 @@ class Yireo_Webp_Model_Observer
      */
     public function coreBlockAbstractToHtmlAfter($observer)
     {
-        if ($this->helper->enabled() == false) {
+        if ($this->helper->canUse() == false) {
             return $this;
         }
 
