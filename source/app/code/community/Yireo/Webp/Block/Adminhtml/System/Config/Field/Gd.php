@@ -48,10 +48,10 @@ class Yireo_Webp_Block_Adminhtml_System_Config_Field_Gd extends Mage_Adminhtml_B
     protected function getCheckLabel($value)
     {
         if ($value == true) {
-            return $this->__('Yes');
+            return '<span style="color:green;">'.$this->__('Yes').'</span>';
         }
 
-        return $this->__('No');
+        return '<span style="color:red;">'.$this->__('No').'</span>';
     }
 
     /**
