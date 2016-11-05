@@ -12,6 +12,7 @@ before_script:
   - pear install PHP_CodeSniffer
   - phpenv rehash
   - sed -i 's/\^file\.\*/\^foobar\.\*/g' vendor/magento-ecg/coding-standard/Ecg/Sniffs/Security/ForbiddenFunctionSniff.php
+  - sed -i 's/\^dir\.\*/\^foobar\.\*/g' vendor/magento-ecg/coding-standard/Ecg/Sniffs/Security/ForbiddenFunctionSniff.php
   - sed -i 's/is_writable/foobar/g' vendor/magento-ecg/coding-standard/Ecg/Sniffs/Security/ForbiddenFunctionSniff.php
   - sed -i 's/is_readable/foobar/g' vendor/magento-ecg/coding-standard/Ecg/Sniffs/Security/ForbiddenFunctionSniff.php
   - sed -i 's/\^exec/\^foobar/g' vendor/magento-ecg/coding-standard/Ecg/Sniffs/Security/ForbiddenFunctionSniff.php
