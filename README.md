@@ -1,4 +1,4 @@
-# Yireo WebP
+# Yireo Webp
 
 Magento extension to allow for WebP support in your frontend
 
@@ -16,8 +16,8 @@ once you're done.
 3) Use `modman` to install the git repository for you:
 
     modman init
-    modman clone https://github.com/yireo/Yireo_WebP
-    modman update Yireo_WebP
+    modman clone https://github.com/yireo/Yireo_Webp
+    modman update Yireo_Webp
 
 4) Use `composer` to install the composer package for you. See below.
 
