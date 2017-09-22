@@ -1,8 +1,8 @@
 # Modman file
-source/app/code/community/Yireo/WebP                        app/code/community/Yireo/WebP
+source/app/code/community/Yireo/Webp                        app/code/community/Yireo/Webp
 source/app/design/frontend/base/default/layout/webp.xml     app/design/frontend/base/default/layout/webp.xml
 source/app/design/frontend/base/default/templates/webp      app/design/frontend/base/default/templates/webp
 source/app/design/frontend/base/default/layout/webp.xml     app/design/frontend/base/default/layout/
-source/app/etc/modules/Yireo_WebP.xml                       app/etc/modules/Yireo_WebP.xml
+source/app/etc/modules/Yireo_Webp.xml                       app/etc/modules/Yireo_Webp.xml
 source/skin/frontend/default/default/css/webp.css           skin/frontend/default/default/css/webp.css
 source/js/webp                                              js/webp

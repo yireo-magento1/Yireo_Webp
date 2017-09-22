@@ -5,7 +5,7 @@
  *
  * @package     Yireo_Webp
  * @author      Yireo (https://www.yireo.com/)
- * @copyright   Copyright 2015 Yireo (https://www.yireo.com/)
+ * @copyright   Copyright 2017 Yireo (https://www.yireo.com/)
  * @license     Open Yireo License
  */
 -->
@@ -35,7 +35,7 @@
                 <class>Yireo_Webp_Model</class>
             </webp>
         </models>
-	</global>
+    </global>
 
     <frontend>
         <events>
@@ -65,8 +65,8 @@
                 <enabled>1</enabled>
                 <load_css>0</load_css>
                 <load_jquery>1</load_jquery>
-                <cwebp_enabled>1</cwebp_enabled>
-                <cwebp_path></cwebp_path>
+                <cwebp_enabled>0</cwebp_enabled>
+                <cwebp_path>/usr/local/bin/cwebp</cwebp_path>
                 <gd_enabled>1</gd_enabled>
             </webp>
         </web>

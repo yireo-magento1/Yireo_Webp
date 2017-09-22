@@ -145,6 +145,14 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @return bool
+     */
+    public function hasCheckTransparency()
+    {
+        return (bool)Mage::getStoreConfig('web/webp/check_transparency');
+    }
+
+    /**
      * Method to check whether WebP should actually be introduced
      *
      * @param string $image
@@ -196,7 +204,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Detect alpha-transparency in PNG-images and skip it
-        if ($this->hasAlphaTransparency($imagePath)) {
+        if ($this->hasCheckTransparency() && $this->hasAlphaTransparency($imagePath)) {
             return false;
         }
 
