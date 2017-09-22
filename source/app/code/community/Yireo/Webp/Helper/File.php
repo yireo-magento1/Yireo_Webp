@@ -24,7 +24,7 @@ class Yireo_Webp_Helper_File extends Mage_Core_Helper_Abstract
         $validator = new Zend_Validate_File_Exists();
         $validator->addDirectory(dirname($file));
 
-        if ($validator->isValid($file)) {
+        if ($validator->isValid(basename($file))) {
             return true;
         }
 
