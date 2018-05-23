@@ -41,7 +41,6 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return true;
         }
 
-        /** @var Mage_Core_Helper_Http $httpHelper */
         if ($this->isChromeBrowser()) {
             return true;
         }
@@ -250,7 +249,9 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
+        set_error_handler(function() {}, E_WARNING);
         imagewebp($image, $webpPath);
+        restore_error_handler();
 
         return $webpPath;
     }
