@@ -250,7 +250,13 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         set_error_handler(function() {}, E_WARNING);
-        imagewebp($image, $webpPath);
+
+        try {
+            imagewebp($image, $webpPath);
+        } catch(Exception $e) {
+            return false;
+        }
+
         restore_error_handler();
 
         return $webpPath;
