@@ -82,7 +82,7 @@ class Yireo_Webp_Model_Observer
             $webpUrl = $this->convertImageUrlToWebp($imageUrl);
 
             if (empty($webpUrl)) {
-                return false;
+                continue;
             }
 
             // Replace the img tag in the HTML
