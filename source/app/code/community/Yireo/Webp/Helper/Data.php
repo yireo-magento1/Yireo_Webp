@@ -216,7 +216,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // GD function
-        $webpPath = $this->convertToWebpViaGd($imagePath, $webpPath);
+        $this->convertToWebpViaGd($imagePath, $webpPath);
         if ($this->fileHelper->exists($webpPath)) {
             return $webpPath;
         }
@@ -253,7 +253,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
 
         try {
             imagewebp($image, $webpPath);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
 
@@ -340,15 +340,15 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getSystemPaths()
     {
         $systemPaths = array(
-            'skin' => array(
-                'url' => Mage::getBaseUrl('skin'),
-                'path' => Mage::getBaseDir('skin').DS),
+            'skin'  => array(
+                'url'  => Mage::getBaseUrl('skin'),
+                'path' => Mage::getBaseDir('skin') . DS),
             'media' => array(
-                'url' => Mage::getBaseUrl('media'),
-                'path' => Mage::getBaseDir('media').DS),
-            'base' => array(
-                'url' => Mage::getBaseUrl(),
-                'path' => Mage::getBaseDir('base').DS));
+                'url'  => Mage::getBaseUrl('media'),
+                'path' => Mage::getBaseDir('media') . DS),
+            'base'  => array(
+                'url'  => Mage::getBaseUrl(),
+                'path' => Mage::getBaseDir('base') . DS));
 
         return $systemPaths;
     }
