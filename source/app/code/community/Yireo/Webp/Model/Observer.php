@@ -87,7 +87,7 @@ class Yireo_Webp_Model_Observer
 
             // Replace the img tag in the HTML
             $htmlTag = $matches[0][$index];
-            $newHtmlTag = str_replace('src="' . $imageUrl, 'data-img="' . md5($imageUrl), $htmlTag);
+            $newHtmlTag = str_replace('src="' . $imageUrl, ' src="' . Mage::getBaseUrl("skin") . 'frontend/default/default/images/webp/placeholder.png" data-img="' . md5($imageUrl), $htmlTag);
             $html = str_replace($htmlTag, $newHtmlTag, $html);
 
             // Add the images to the return-array
