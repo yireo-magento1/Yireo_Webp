@@ -300,7 +300,7 @@ class Yireo_Webp_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        if (preg_match('/\.png$/', $image)) {
+        if (!preg_match('/\.png$/', $image)) {
             return false;
         }
 
