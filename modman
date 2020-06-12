@@ -4,4 +4,5 @@ source/app/design/frontend/base/default/layout/webp.xml     app/design/frontend/
 source/app/design/frontend/base/default/layout/webp.xml     app/design/frontend/base/default/layout/
 source/app/etc/modules/Yireo_Webp.xml                       app/etc/modules/Yireo_Webp.xml
 source/skin/frontend/default/default/css/webp.css           skin/frontend/default/default/css/webp.css
+source/skin/frontend/default/default/images/webp            skin/frontend/default/default/images/webp
 source/js/webp                                              js/webp

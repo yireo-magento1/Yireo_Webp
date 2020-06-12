@@ -18,9 +18,12 @@ class Yireo_Webp_Helper_File extends Mage_Core_Helper_Abstract
      *
      * @param string $file
      * @return bool
+     * @throws Zend_Validate_Exception
      */
     public function exists($file)
     {
+        $file = $this->stripInvalidCharacters($file);
+
         $validator = new Zend_Validate_File_Exists();
         $validator->addDirectory(dirname($file));
 
@@ -93,5 +96,15 @@ class Yireo_Webp_Helper_File extends Mage_Core_Helper_Abstract
         }
 
         return false;
+    }
+
+    /**
+     * @param $fileName
+     * @return string
+     */
+    private function stripInvalidCharacters($fileName)
+    {
+        $fileName = preg_replace('/([^a-zA-Z0-9\.\-\_\/]+)/', '', $fileName);
+        return $fileName;
     }
 }
