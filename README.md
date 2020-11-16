@@ -1,5 +1,5 @@
 # Yireo Webp
-Magento extension to allow for WebP support in your frontend
+**This Magento 1 extension is deprecated and will no longer be updated, except for merging new Pull Requests.**
 
 ## See also
 - [Background](BACKGROUND.md)
